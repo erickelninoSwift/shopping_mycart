@@ -20,13 +20,22 @@ const AppContext = createContext();
 
 const defaultState = {
   items: cartItems,
-  loading: true,
+  loading: false,
   cart: new Map(),
 };
 
 const reducer = (state, action) => {
   if (action.type === LOADING) {
-    return { ...state, cart: action.payload.data, loading: false };
+    return { ...state, loading: true };
+  }
+
+  if (action.type === DISPLAY_ITEM) {
+    let dataFetched = action.payload.data.map((data) => {
+      return [data.id, data];
+    });
+    let dataStatus = new Map(dataFetched);
+    // { ...state, cart: action.payload.data, loading: false };
+    return { ...state, cart: dataStatus, loading: false };
   }
 
   switch (action.type) {
@@ -82,10 +91,11 @@ const AppContextApplication = ({ children }) => {
 
   const url = "https://www.course-api.com/react-useReducer-cart-project";
   useEffect(() => {
+    dispach({ type: LOADING });
     const fetchAlldata = async () => {
       const fetchData = await fetch(url);
       const data = await fetchData.json();
-      dispach({ type: LOADING, payload: { data } });
+      dispach({ type: DISPLAY_ITEM, payload: { data } });
     };
     fetchAlldata();
   }, []);
