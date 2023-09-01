@@ -1,5 +1,6 @@
 import { useState, createContext, useContext, useReducer } from "react";
 import cartItems from "./data";
+import { getTotals } from "./utils";
 import {
   CLEAR_CART,
   REMOVE,
@@ -40,7 +41,7 @@ const reducer = (state, action) => {
     case DECREASE:
       let mycart1 = new Map(state.cart);
       let item1 =
-        mycart1.get(action.payload.id).amount > 0
+        mycart1.get(action.payload.id).amount > 1
           ? mycart1.get(action.payload.id).amount--
           : 0;
       return { ...state, cart: mycart1 };
@@ -52,6 +53,10 @@ const reducer = (state, action) => {
 
 const AppContextApplication = ({ children }) => {
   const [state, dispach] = useReducer(reducer, defaultState);
+
+  const { totalAmount, totalCost } = getTotals(state.cart);
+  console.log(totalAmount);
+  console.log(totalCost);
 
   const clearCart = () => {
     dispach({ type: CLEAR_CART });
@@ -70,7 +75,15 @@ const AppContextApplication = ({ children }) => {
   };
   return (
     <AppContext.Provider
-      value={{ ...state, clearCart, removeItem, increaseItem, decrease }}
+      value={{
+        ...state,
+        clearCart,
+        removeItem,
+        increaseItem,
+        decrease,
+        totalAmount,
+        totalCost,
+      }}
     >
       {children}
     </AppContext.Provider>
